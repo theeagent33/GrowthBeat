@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Sound Buttons (Web Audio API)</title>
+  <style>
+    /* --- Styles Généraux --- */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000000;
+    }
+
+    /* --- Conteneur Principal --- */
+    .main-flexbox {
+      display: flex;
+      
+      flex-direction: column; /* Empile les rangées verticalement */
+      height: 100vh; /* Occupe toute la hauteur de l'écran */
+      box-sizing: border-box;
+      background-color: #ffffff;
+    }
+
+    /* --- Rangées --- */
+    .row {
+      display: flex;
+      flex-direction: row; /* Colonnes alignées horizontalement */
+      flex: 1; /* Chaque rangée prend un espace égal */
+    }
+
+    /* --- Colonnes --- */
+    .column {
+      display: flex;
+      flex-direction: column; /* Empile les éléments verticalement */
+      flex: 1; /* Chaque colonne prend un espace égal dans la rangée */
+      background-color: #ffffff;
+      box-sizing: border-box;
+    }
+
+    /* --- Boutons --- */
+    .button {
+      flex: 1; /* Chaque bouton prend un espace égal dans sa colonne */
+      border: 3px #f0f0f0;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .button:hover {
+      transform: scale(1.05); /* Agrandir légèrement au survol */
+    }
+
+    /* --- Couleurs des boutons --- */
+    .blue0 { background-color: #61abf6; }
+    .blue { background-color: #0066cc; }
+    .blue2 { background-color: #002d5b; }
+    .yellow { background-color: #ffcc00; }
+    .red { background-color: #b60808; }
+    .orange { background-color: #ff6600; }
+
+    /* Greens */
+    .green0 { background-color: #98eb98; } 
+    .green1 { background-color: #79ff79; }
+    .green2 { background-color: #52e252; }
+    .green3 { background-color: #33cc33; }
+    .green4 { background-color: #23a023; }
+    .green5 { background-color: #146814; }
+    .green6 { background-color: #075007; }
+    .green7 { background-color: #003700; }
+    .green8 { background-color: #002e00; } 
+    .green9 { background-color: #001a00; } 
+
+    /* Yellow-to-Brown Gradient */
+    .ye0 { background-color: #ffffcc; } /* Lightest yellow */
+    .ye1 { background-color: #ffff99; }
+    .ye2 { background-color: #ffcc66; }
+    .ye3 { background-color: #ff9933; } /* Orange */
+    .ye4 { background-color: #ff6600; }
+    .ye5 { background-color: #cc5200; }
+    .ye6 { background-color: #993d00; }
+    .ye7 { background-color: #662900; }
+    .ye8 { background-color: #4d1f00; }
+    .ye9 { background-color: #331400; } /* Darkest brown */
+
+    .cyan { background-color: #00cccc; }
+    .pink { background-color: #ff66cc; }
+    .fuschia { background-color: #990b5e; }
+    .purple { background-color: #4f045e; }
+    .darkgray { background-color: #454545; }
+    .gray { background-color: #808080; }
+    .black { background-color: #171717; }
+
+    /* Big Button Container */
+    .big-button-container {
+      display: flex;
+      justify-content: center; /* Center the button horizontally */
+      align-items: center;
+      height: 50px; /* Adjust height as needed */
+      width: 100%; /* Full width */
+    }
+
+    /* Big Button Style */
+    .big-button {
+      background-color: white;
+      border: #0066cc;
+      color: #000;
+      font-family: "Calibri";
+     
+      font-size: 1.2rem;
+      width: 100%; /* Take full width of container */
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+    .big-button:hover {
+      background-color: #f0f0f0; /* Light gray hover effect */
+      transform: scale(1.05); /* Slightly enlarge on hover */
+    }
+
+    /* Sélection visuelle */
+    .selected {
+      filter: brightness(250%);
+    }
+  </style>
+</head>
+<body>
+  <div class="main-flexbox">
+    <!-- Première Rangée -->
+    <div class="row">
+      <div class="column" data-sound="hihat">
+        <button class="button blue2" data-frequency="1000"></button>
+        <button class="button blue" data-frequency="2000"></button>
+      </div>
+      <div class="column" data-sound="kick">
+        <button class="button green0" data-frequency="20"></button>
+        <button class="button green1" data-frequency="40"></button>
+        <button class="button green2" data-frequency="60"></button>
+        <button class="button green3" data-frequency="80"></button>
+        <button class="button green1" data-frequency="120"></button>
+        <button class="button green2" data-frequency="140"></button>
+        <button class="button green3" data-frequency="160"></button>
+        <button class="button green4" data-frequency="180"></button>
+        <button class="button green5" data-frequency="200"></button>
+        <button class="button green6" data-frequency="220"></button>
+        <button class="button green7" data-frequency="240"></button>
+        <button class="button green8" data-frequency="280.00"></button>
+        <button class="button green9" data-frequency="100"></button>
+      </div>
+      <div class="column">
+        <button class="button red" data-frequency="100"></button>
+        <button class="button orange" data-frequency="200"></button>
+        <button class="button yellow" data-frequency="100"></button>
+        <button class="button green1" data-frequency="100"></button>
+        <button class="button cyan" data-frequency="300"></button>
+        <button class="button pink" data-frequency="500"></button>
+        <button class="button fuschia" data-frequency="600"></button>
+        <button class="button purple" data-frequency="700"></button>
+        
+      </div>
+
+      
+      <div class="column" data-sound="bass">
+        <button class="button red" data-frequency="100"></button>
+        <button class="button orange" data-frequency="200"></button>
+        <button class="button yellow" data-frequency="100"></button>
+        <button class="button green1" data-frequency="100"></button>
+        <button class="button cyan" data-frequency="300"></button>
+        <button class="button pink" data-frequency="500"></button>
+        <button class="button fuschia" data-frequency="600"></button>
+        <button class="button purple" data-frequency="700"></button>
+      </div>
+      
+      <div class="column" data-sound="snare">
+        <button class="button blue0" data-frequency="123.25"></button>
+        <button class="button blue" data-frequency="587.33"></button>
+        <button class="button blue2" data-frequency="659.25"></button>
+      </div>
+     
+      <div class="column">
+        <button class="button ye0" data-frequency="230"></button>
+        <button class="button ye1" data-frequency="260"></button>
+        <button class="button ye2" data-frequency="290"></button>
+        <button class="button ye3" data-frequency="320"></button>
+        <button class="button ye1" data-frequency="380"></button>
+        <button class="button ye2" data-frequency="410"></button>
+        <button class="button ye3" data-frequency="440"></button>
+        <button class="button ye4" data-frequency="470"></button>
+        <button class="button ye5" data-frequency="500"></button>
+        <button class="button ye6" data-frequency="530"></button>
+        <button class="button ye7" data-frequency="560"></button>
+        <button class="button ye8" data-frequency="590"></button>
+        <button class="button ye9" data-frequency="350"></button>
+      </div>
+      
+    </div>
+
+    <div class="big-button-container">
+      <button class="big-button">R E C O R D</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Création du contexte audio ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // --- Variables d'état globales ---
+    let isRecording = false;                // Indique si l'enregistrement est en cours
+    let recordedLayers = [];               // Tableau contenant toutes les couches (layers) enregistrées
+    let currentLayer = [];                 // Tableau temporaire pour la couche en cours d'enregistrement
+    let playbackTimeouts = [];             // Tableau des ID de timeout pour la lecture en boucle
+
+    // This map will hold data about the note that started on "mousedown"
+    // but hasn't finished yet (we finalize it on "mouseup").
+    let activeNotes = new Map();
+
+    let osc = null;                        // Oscillateur utilisé pour les sons continus (mode "mousedown")
+    let selectionMode = false;             // Mode sélection
+    let selectedButtons = new Set();       // Ensemble des boutons actuellement sélectionnés
+    let holdTimeout;                       // ID du timeout pour le passage en mode sélection après un appui long
+
+    // === FONCTIONS DE GÉNÉRATION DE SONS ===
+    function playKick(frequency = 100) {
+      const kickOsc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      kickOsc.type = 'sine';
+      kickOsc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+      gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+      kickOsc.connect(gain).connect(audioCtx.destination);
+      kickOsc.start();
+      kickOsc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    function playSnare(frequency = 1000) {
+      const bufferSize = audioCtx.sampleRate * 0.2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+
+      noise.connect(filter).connect(gain).connect(audioCtx.destination);
+      noise.start();
+      noise.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function playHiHat(frequency = 8000) {
+      const bufferSize = audioCtx.sampleRate * 0.05;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+      noise.connect(filter).connect(gain).connect(audioCtx.destination);
+      noise.start();
+      noise.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function playBass(frequency = 50) {
+      const bassOsc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      bassOsc.type = 'sawtooth';
+      bassOsc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+      gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+      bassOsc.connect(gain).connect(audioCtx.destination);
+      bassOsc.start();
+      bassOsc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    function playSound(frequency) {
+      const oscillator = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+      oscillator.connect(gain).connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    }
+
+    // Identifie le type de son à jouer (short, "one-shot" style)
+    function playColumnSoundStart(column, frequency) {
+      const soundType = column.getAttribute('data-sound');
+      if (soundType === 'kick') {
+        playKick(frequency);
+      } else if (soundType === 'snare') {
+        playSnare(frequency);
+      } else if (soundType === 'hihat') {
+        playHiHat(frequency);
+      } else if (soundType === 'bass') {
+        playBass(frequency);
+      } else {
+        playSound(frequency);
+      }
+    }
+
+    // A specialized function to schedule a continuous oscillator for playback,
+    // respecting 'startTime' and 'duration'.
+    function scheduleNotePlayback(column, frequency, offset, duration) {
+      // We'll start the sound at offset ms from "now"
+      const startTimeout = setTimeout(() => {
+        // If you want "one-shot" style for certain columns, do so here:
+        const soundType = column.getAttribute('data-sound');
+        if (soundType === 'kick' || soundType === 'snare' ||
+            soundType === 'hihat' || soundType === 'bass') {
+          // one-shot
+          playColumnSoundStart(column, frequency);
+        } else {
+          // continuous oscillator, THEN stop it after 'duration'
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+
+          osc.connect(gain).connect(audioCtx.destination);
+          osc.start();
+
+          const stopTimeout = setTimeout(() => {
+            osc.stop();
+            osc.disconnect();
+          }, duration);
+          playbackTimeouts.push(stopTimeout);
+        }
+      }, offset);
+      playbackTimeouts.push(startTimeout);
+    }
+
+    // Relecture de toutes les couches enregistrées en boucle
+    function playRecordedLayers() {
+      // Nettoie les anciens timeouts
+      playbackTimeouts.forEach(timeout => clearTimeout(timeout));
+      playbackTimeouts = [];
+
+      // Calcule la durée max pour savoir quand relancer la boucle
+      // We use (startTime + duration) on each note to find total length
+      const maxDuration = Math.max(
+        ...recordedLayers.flatMap(layer =>
+          layer.map(entry => (entry.startTime + entry.duration) - layer[0].startTime)
+        )
+      );
+
+      // Planifie la lecture de chaque layer
+      recordedLayers.forEach(layer => {
+        const layerStart = layer[0].startTime; // first note's start time
+        layer.forEach(entry => {
+          // offset from the earliest note in this layer
+          const offset = entry.startTime - layerStart;
+          scheduleNotePlayback(
+            entry.column,
+            entry.frequency,
+            offset,        // ms from now
+            entry.duration // how long to hold
+          );
+        });
+      });
+
+      // Relance la boucle après la durée max + 500ms
+      const loopTimeout = setTimeout(playRecordedLayers, maxDuration + 500);
+      playbackTimeouts.push(loopTimeout);
+    }
+
+    // Récupère toutes les colonnes pour repérer leur index
+    const allColumns = Array.from(document.querySelectorAll('.column'));
+
+    // Gère les événements pour les boutons
+    const buttons = document.querySelectorAll('.button');
+    buttons.forEach(button => {
+      const column = button.closest('.column');
+
+      // mousedown => start a continuous oscillator for immediate feedback
+      button.addEventListener('mousedown', () => {
+        if (!selectionMode) {
+          const frequency = parseFloat(button.getAttribute('data-frequency'));
+          osc = audioCtx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+          osc.connect(audioCtx.destination);
+          osc.start();
+
+          // If we're recording, record the start
+          if (isRecording) {
+            activeNotes.set(button, {
+              column,
+              frequency,
+              startTime: performance.now(),
+              duration: 0 // we will fill on mouseup
+            });
+          }
+        }
+      });
+
+      // mouseup => stop the oscillator
+      button.addEventListener('mouseup', () => {
+        if (!selectionMode && osc) {
+          osc.stop();
+          osc.disconnect();
+          osc = null;
+        }
+        // If we were recording a note, finalize it
+        if (isRecording && activeNotes.has(button)) {
+          const noteObj = activeNotes.get(button);
+          const endTime = performance.now();
+          noteObj.duration = endTime - noteObj.startTime;
+          currentLayer.push(noteObj);
+          activeNotes.delete(button);
+        }
+      });
+
+      // mouseleave => stop the oscillator if leaving the button
+      button.addEventListener('mouseleave', () => {
+        if (!selectionMode && osc) {
+          osc.stop();
+          osc.disconnect();
+          osc = null;
+        }
+        // If recording, finalize
+        if (isRecording && activeNotes.has(button)) {
+          const noteObj = activeNotes.get(button);
+          const endTime = performance.now();
+          noteObj.duration = endTime - noteObj.startTime;
+          currentLayer.push(noteObj);
+          activeNotes.delete(button);
+        }
+      });
+
+      // click => handle selection mode or immediate one-shot playback
+      button.addEventListener('click', () => {
+        if (selectionMode) {
+          // --- MODE SÉLECTION ---
+          const columnIndex = allColumns.indexOf(column);
+
+          // Example: special rule for columns 1 or 5 => up to 2 selections
+          if (columnIndex === 1 || columnIndex === 5) {
+            const buttonsInThisColumn = column.querySelectorAll('.button');
+            const alreadySelected = Array.from(buttonsInThisColumn)
+              .filter(b => b.classList.contains('selected'));
+
+            if (button.classList.contains('selected')) {
+              // Deselect if clicked again
+              button.classList.remove('selected');
+              selectedButtons.delete(button);
+            } else {
+              // If not selected yet
+              if (alreadySelected.length < 2) {
+                button.classList.add('selected');
+                selectedButtons.add(button);
+              } else {
+                // Already have 2 => remove them
+                for (const b of alreadySelected) {
+                  b.classList.remove('selected');
+                  selectedButtons.delete(b);
+                }
+                // Select the new one
+                button.classList.add('selected');
+                selectedButtons.add(button);
+              }
+            }
+          } else {
+            // For other columns => single selection
+            const buttonsInColumn = column.querySelectorAll('.button');
+            buttonsInColumn.forEach(btn => {
+              btn.classList.remove('selected');
+              selectedButtons.delete(btn);
+            });
+            if (!button.classList.contains('selected')) {
+              button.classList.add('selected');
+              selectedButtons.add(button);
+            } else {
+              button.classList.remove('selected');
+              selectedButtons.delete(button);
+            }
+          }
+
+        } else {
+          // --- MODE ENREGISTREMENT / BEAT-MAKING ---
+          // Optional one-shot sound on click
+          const frequency = parseFloat(button.getAttribute('data-frequency'));
+          const soundType = column.getAttribute('data-sound');
+          if (soundType === 'kick' || soundType === 'snare' ||
+              soundType === 'hihat' || soundType === 'bass') {
+            playColumnSoundStart(column, frequency);
+          }
+        }
+      });
+    });
+
+    // Big button (record / selection)
+    const bigButton = document.querySelector('.big-button');
+
+    // mousedown => possible long press to toggle selectionMode
+    bigButton.addEventListener('mousedown', () => {
+      holdTimeout = setTimeout(() => {
+        selectionMode = !selectionMode;
+        bigButton.textContent = selectionMode
+          ? 'RECORD AGAIN'
+          : 'RECORD';
+
+        // If we exit selection mode, reset selection
+        if (!selectionMode) {
+          selectedButtons.forEach(btn => btn.classList.remove('selected'));
+          selectedButtons.clear();
+        }
+      }, 2000);
+    });
+
+    // mouseup => either stop the hold or handle record logic
+    bigButton.addEventListener('mouseup', () => {
+      clearTimeout(holdTimeout);
+
+      if (!selectionMode) {
+        // --- RECORDING LOGIC ---
+        if (isRecording) {
+          // Stop recording
+          isRecording = false;
+          activeNotes.forEach((noteObj, btn) => {
+            noteObj.duration = performance.now() - noteObj.startTime;
+            currentLayer.push(noteObj);
+          });
+          activeNotes.clear();
+
+          if (currentLayer.length) {
+            recordedLayers.push(currentLayer);
+          }
+          bigButton.textContent = 'RECORD';
+
+          // Playback if we have layers
+          if (recordedLayers.length > 0) {
+            playRecordedLayers();
+          }
+        } else {
+          // Start recording
+          isRecording = true;
+          currentLayer = [];
+          bigButton.textContent = 'STOP RECORDING';
+        }
+      } else {
+        // --- SELECTION MODE: SEND DATA ---
+        const selectedData = Array.from(selectedButtons).map(button => ({
+          frequency: button.getAttribute('data-frequency'),
+          color: getComputedStyle(button).backgroundColor
+        }));
+        console.log('Selected Data Sent:', selectedData);
+
+        // === Unselect all after sending the data ===
+        selectedButtons.forEach(btn => btn.classList.remove('selected'));
+        selectedButtons.clear();
+
+        // Confirmation visual
+        bigButton.style.color = 'green';
+        setTimeout(() => {
+          bigButton.style.color = '';
+        }, 1000);
+      }
+    });
+
+    // mouseleave => cancel hold if we leave the big button
+    bigButton.addEventListener('mouseleave', () => {
+      clearTimeout(holdTimeout);
+    });
+  </script>
+</body>
+</html>
